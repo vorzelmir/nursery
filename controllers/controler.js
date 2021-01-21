@@ -1,12 +1,28 @@
-const mongoose = require('mongoose');
-const UserModel = require('../models/userModel');
-const PetModel = require('../models/petModel');
-const NurseryModel = require('../models/nurserySchema');
+const {
+  User,
+} = require('../models/userModel');
+const {
+  Pet,
+} = require('../models/petModel');
 
-exports.createUser = async () => {
-  const user = new UserModel({
-    name: 'Bill Clinton',
+exports.createUser = async (name, email, hasPet, petName, petType, petAge, owner) => {
+  const petModel = new Pet({
+    petName,
+    petType,
+    petAge,
+    owner,
   });
-  const result = await user.save();
-  console.log(result);
+  const userModel = new User({
+    name,
+    email,
+    hasPet,
+    petModel,
+  });
+  let result;
+  try {
+    result = await userModel.save();
+    console.log(result);
+  } catch (err) {
+    console.error(err);
+  }
 };
