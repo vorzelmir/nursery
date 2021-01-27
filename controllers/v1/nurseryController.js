@@ -1,23 +1,25 @@
 const { Nursery } = require('../../DB/index');
 
-exports.createNursery = async (name, property) => {
+exports.createNursery = async (head, user, pet) => {
   try {
     const nurseryModel = new Nursery({
-      name,
-      property,
+      head,
+      user,
+      pet,
     });
     const result = await nurseryModel.save();
-    console.log('Result', result);
+    console.log(result);
   } catch (e) {
-    console.error('Nursery create error: ', e);
+    console.error('Nursery cannot created');
   }
 };
 
-exports.getNursery = async () => {
+exports.getNursery = async (prop) => {
   try {
     const nursery = await Nursery
       .find()
-      .populate('nursery');
+      .populate(prop)
+      .select('head');
     console.log(nursery);
   } catch (e) {
     console.error(e.message);

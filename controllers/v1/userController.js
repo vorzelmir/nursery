@@ -1,79 +1,79 @@
 const { User } = require('../../DB/index');
 
-exports.createUser = async (firstname, email, hasPet, pet) => {
+exports.createUser = async (req, res) => {
   try {
-    const userModel = new User({
-      firstname,
-      email,
-      hasPet,
-      pet,
+    const user = await User.create(req.body);
+    return res.status(200).json({
+      success: true,
+      data: user,
     });
-    const result = await userModel.save();
-    console.log(result);
   } catch (err) {
-    console.error('Error message: ', err);
-  }
-};
-
-exports.getAllUser = async () => {
-  try {
-    const users = await User
-      .find();
-    console.log(users);
-  } catch (err) {
-    console.error(err.message);
-  }
-};
-
-exports.getUserByName = async (name) => {
-  try {
-    const user = await User
-      .find({ firstname: name });
-    console.log(user);
-  } catch (err) {
-    console.error(err.message);
-  }
-};
-
-exports.updateUserOne = async (id, firstname, email, hasPet, pet) => {
-  try {
-    const user = await User.findById(id);
-    if (!user) {
-      return;
-    }
-    user.firstname = firstname;
-    user.email = email;
-    user.hasPet = hasPet;
-    user.pet = pet;
-
-    const result = await user.save();
-    console.log(result);
-  } catch (err) {
-    console.error(err.message);
-  }
-};
-
-exports.updateUserTwo = async (id, firstname, email, hasPet, pet) => {
-  try {
-    const user = await User.update({ _id: id }, {
-      $set: {
-        firstname,
-        email,
-        hasPet,
-        pet,
-      },
+    res.status(400).json({
+      success: 'fail',
+      message: err,
     });
-    console.log(user);
+  }
+  return null;
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
   } catch (err) {
-    console.error(err.message);
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+  return null;
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
   }
 };
 
-exports.deleteUser = async (id) => {
+exports.updateUser = async (req, res) => {
   try {
-    const result = await User.deleteOne({ _id: id });
-    console.log(result);
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+    // const result = await user.save();
   } catch (err) {
-    console.error(err.message);
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: null,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: 'fail',
+      message: err,
+    });
   }
 };

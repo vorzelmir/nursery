@@ -1,16 +1,18 @@
 const mongoose = require('mongoose');
 
-const PropertySchema = mongoose.Schema({
-  property: {
+const NurserySchema = new mongoose.Schema({
+  head: {
     type: String,
-    enum: ['nursery', 'user'],
-    default: 'nursery',
+    unique: true,
   },
-});
-
-const NurserySchema = mongoose.Schema({
-  name: String,
-  property: { PropertySchema },
+  user: {
+    type: String,
+    ref: 'User',
+  },
+  pet: {
+    type: String,
+    ref: 'Pet',
+  },
 });
 
 module.exports = { NurserySchema };
