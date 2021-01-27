@@ -1,74 +1,76 @@
 const { Pet } = require('../../DB/index');
 
-exports.createPet = async (petName, petType, petAge, owner, house) => {
+exports.createPet = async (req, res) => {
   try {
-    const petModel = new Pet({
-      petName,
-      petType,
-      petAge,
-      owner,
-      house,
+    const pet = await Pet.create(req.body);
+    res.status(200).json({
+      success: true,
+      data: pet,
     });
-    const result = await petModel.save();
-    console.log(result);
   } catch (err) {
-    console.error('Pet create error message', err);
-  }
-};
-
-exports.getAllPets = async (master) => {
-  try {
-    const pets = await Pet.find()
-      .populate(master)
-      .select('user');
-    console.log(pets);
-  } catch (err) {
-    console.error(err.message);
-  }
-};
-
-exports.getPetByName = async (name) => {
-  try {
-    const pet = await Pet.find()
-      .populate({ petName: name })
-      .select();
-    console.log(pet);
-  } catch (e) {
-    console.error(e.message);
-  }
-};
-
-exports.updatePet = async (id, newPet, owner, house) => {
-  try {
-    const pet = new Pet(newPet);
-    if (!await Pet.findById(id)) {
-      console.log('cannot find pet ');
-      return;
-    }
-    const result = await Pet.updateOne({ _id: id }, {
-      $set: {
-        petName: pet.petName,
-        petType: pet.petType,
-        petAge: pet.petAge,
-        owner,
-        house,
-      },
+    res.status(400).json({
+      success: 'fail',
+      message: err,
     });
-    console.log(result);
-  } catch (err) {
-    console.error(err.message);
   }
 };
 
-exports.deletePet = async (id) => {
+exports.getAllPets = async (req, res) => {
   try {
-    if (!await Pet.findById(id)) {
-      console.error(`Cannot find pet with: ${id} id`);
-      return;
-    }
-    const result = await Pet.deleteOne({ _id: id });
-    console.log(result);
-  } catch (e) {
-    console.error(e.message);
+    const pets = await Pet.find();
+    res.status(200).json({
+      success: true,
+      data: pets,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getPet = async (req, res) => {
+  try {
+    const pet = await Pet.findById(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: pet,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.updatePet = async (req, res) => {
+  try {
+    const pet = await Pet.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({
+      success: true,
+      data: pet,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.deletePet = async (req, res) => {
+  try {
+    await Pet.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      success: true,
+      data: null,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: 'fail',
+      message: err,
+    });
   }
 };
